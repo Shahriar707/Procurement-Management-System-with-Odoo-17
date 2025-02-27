@@ -1,0 +1,306 @@
+<odoo>
+    <template id="portal_my_home_otp_2" inherit_id="portal.portal_my_home">
+        <xpath expr="//div[@id='portal_vendor_category']" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/sale/static/src/img/bag.svg'"/>
+                <t t-set="title">Vendor's RFPs</t>
+                <t t-set="text">Detailed View and Information about all of the RFPs by the Vendor</t>
+                <t t-set="url" t-value="'/my/vendor_rfps'"/>
+                <t t-set="config_card" t-value="True"/>
+            </t>
+        </xpath>
+    </template>
+
+    <template id="vendor_rfp_list_template" name="Vendor RFQ List">
+        <t t-call="portal.portal_layout">
+            <style>
+                /* Custom Styles */
+                .custom-header {
+                    background: linear-gradient(to right, #007bff, #0056b3);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+                    text-align: center;
+                    margin-bottom: 20px;
+                }
+
+                .table th {
+                    background-color: #007bff !important;
+                    color: white !important;
+                    text-transform: uppercase;
+                    font-size: 1rem;
+                    padding: 12px;
+                    text-align: center;
+                }
+
+                .table tbody tr:hover {
+                    background-color: #f8f9fa !important;
+                    transition: 0.3s ease-in-out;
+                }
+
+                .badge {
+                    font-size: 0.9rem;
+                    padding: 8px 12px;
+                    border-radius: 12px;
+                    font-weight: bold;
+                }
+
+                .btn-custom {
+                    background: #28a745;
+                    color: white;
+                    font-size: 1.1rem;
+                    font-weight: bold;
+                    padding: 8px 16px;
+                    border-radius: 30px;
+                    transition: 0.3s;
+                    display: inline-block;
+                }
+
+                .btn-custom:hover {
+                    background: #218838;
+                }
+
+                .pagination-container {
+                    margin-top: 20px;
+                    display: flex;
+                    justify-content: center;
+                    gap: 15px;
+                }
+
+                .pagination-container a {
+                    padding: 10px 15px;
+                    text-decoration: none;
+                    font-weight: bold;
+                    border-radius: 6px;
+                    transition: 0.3s;
+                }
+
+                .pagination-container a:hover {
+                    background: #f8f9fa;
+                }
+            </style>
+
+            <div class="container mt-5">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb bg-light p-2 rounded">
+                        <li class="breadcrumb-item"><a href="/my">🏠 Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">📜 My Accepted RFQs</li>
+                    </ol>
+                </nav>
+
+                <!-- Header Section -->
+                <div class="custom-header">
+                    <h1 class="m-0">
+                        <i class="fa fa-handshake"></i> My Accepted RFQs
+                    </h1>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover text-center">
+                        <thead>
+                            <tr>
+                                <th><i class="fa fa-file-alt"></i> RFP Name</th>
+                                <th><i class="fa fa-user-tie"></i> Vendor</th>
+                                <th><i class="fa fa-dollar-sign"></i> Amount</th>
+                                <th><i class="fa fa-info-circle"></i> Status</th>
+                                <th><i class="fa fa-eye"></i> Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="rfqs" t-as="rfq">
+                                <tr>
+                                    <td><strong><t t-esc="rfq.rfp_id.name or 'No RFP Linked'"/></strong></td>
+                                    <td><t t-esc="rfq.partner_id.name"/></td>
+                                    <td><strong>$<t t-esc="rfq.amount_total or 0.0"/></strong></td>
+                                    <td>
+                                        <span class="badge bg-success">
+                                            <i class="fa fa-check-circle"></i> <t t-esc="rfq.state"/>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a t-att-href="'/my/vendor_rfp/%s' % rfq.id" class="btn btn-custom btn-sm">
+                                            <i class="fa fa-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination Section -->
+                <t t-if="total_pages and total_pages != None and total_pages != 1">
+                    <div class="pagination-container">
+                        <!-- Previous Page Button -->
+                        <t t-set="prev_available" t-value="prev_page and prev_page != None and prev_page"/>
+                        <t t-if="prev_available">
+                            <a t-att-href="'/my/vendor_rfps/page/%d' % prev_page"
+                               class="btn btn-outline-secondary">
+                                <i class="fa fa-chevron-left"></i> Previous
+                            </a>
+                        </t>
+
+                        <!-- Next Page Button -->
+                        <t t-set="next_available" t-value="next_page and next_page != None and next_page"/>
+                        <t t-if="next_available">
+                            <a t-att-href="'/my/vendor_rfps/page/%d' % next_page"
+                               class="btn btn-outline-secondary">
+                                Next <i class="fa fa-chevron-right"></i>
+                            </a>
+                        </t>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <template id="vendor_rfp_form_template" name="Vendor RFQ Details">
+        <t t-call="portal.portal_layout">
+            <style>
+                /* Custom Styles */
+                .custom-header {
+                    background: linear-gradient(to right, #007bff, #0056b3);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+                    text-align: center;
+                    margin-bottom: 20px;
+                }
+
+                .table th {
+                    background-color: #007bff !important;
+                    color: white !important;
+                    text-transform: uppercase;
+                    font-size: 1rem;
+                    padding: 12px;
+                    text-align: center;
+                }
+
+                .table tbody tr:hover {
+                    background-color: #f8f9fa !important;
+                    transition: 0.3s ease-in-out;
+                }
+
+                .badge {
+                    font-size: 0.9rem;
+                    padding: 8px 12px;
+                    border-radius: 12px;
+                    font-weight: bold;
+                }
+
+                .btn-custom {
+                    background: #28a745;
+                    color: white;
+                    font-size: 1.1rem;
+                    font-weight: bold;
+                    padding: 8px 16px;
+                    border-radius: 30px;
+                    transition: 0.3s;
+                    display: inline-block;
+                }
+
+                .btn-custom:hover {
+                    background: #218838;
+                }
+
+                .info-box {
+                    padding: 15px;
+                    border-radius: 8px;
+                    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+                    font-size: 1.1rem;
+                }
+
+                .info-box-primary {
+                    background: linear-gradient(to right, #007bff, #0056b3);
+                    color: white;
+                }
+
+                .info-box-success {
+                    background: linear-gradient(to right, #28a745, #218838);
+                    color: white;
+                }
+            </style>
+
+            <div class="container mt-5">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb bg-light p-2 rounded">
+                        <li class="breadcrumb-item"><a href="/my" class="text-decoration-none">🏠 Home</a></li>
+                        <li class="breadcrumb-item"><a href="/my/vendor_rfps" class="text-decoration-none">📜 My Accepted RFQs</a></li>
+                        <li class="breadcrumb-item active fw-bold text-primary" aria-current="page">
+                            <t t-esc="rfq.name"/>
+                        </li>
+                    </ol>
+                </nav>
+
+                <!-- Header Section -->
+                <div class="custom-header">
+                    <h1 class="m-0">
+                        <i class="fa fa-file-invoice-dollar"></i> RFQ Details
+                    </h1>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="info-box info-box-primary">
+                            <strong>📄 RFP ID:</strong>
+                            <span class="badge bg-light text-dark px-3 py-2">
+                                <t t-esc="rfq.rfp_id.name or 'N/A'"/>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-box info-box-primary">
+                            <strong>🏢 Supplier:</strong> <t t-esc="rfq.partner_id.name"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-box info-box-primary">
+                            <strong>📅 Order Date:</strong> <t t-esc="rfq.date_order"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-box info-box-success">
+                            <strong>💰 Total Amount:</strong>
+                            <span class="badge bg-light text-dark fs-5 px-3 py-2">
+                                $<t t-esc="rfq.amount_total"/>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="mt-4 text-center text-primary fw-bold">🛒 Products</h3>
+                <div class="table-responsive">
+                    <table class="table table-hover text-center border rounded-3 overflow-hidden shadow-sm">
+                        <thead>
+                            <tr>
+                                <th><i class="fa fa-image"></i> Image</th>
+                                <th><i class="fa fa-box"></i> Product</th>
+                                <th><i class="fa fa-sort-numeric-up"></i> Quantity</th>
+                                <th><i class="fa fa-dollar-sign"></i> Unit Price</th>
+                                <th><i class="fa fa-money-bill-wave"></i> Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="rfq.order_line" t-as="line">
+                                <tr>
+                                    <td>
+                                        <t t-if="line.product_id.image_1920">
+                                            <img t-att-src="'data:image/png;base64,' + line.product_id.image_1920.decode('utf-8')" width="50" height="50" class="img-thumbnail"/>
+                                        </t>
+                                        <t t-else="">No Image</t>
+                                    </td>
+                                    <td class="fw-semibold"><t t-esc="line.product_id.name"/></td>
+                                    <td><t t-esc="line.product_qty"/></td>
+                                    <td class="text-primary">$<t t-esc="line.price_unit"/></td>
+                                    <td class="fw-bold text-success">$<t t-esc="line.price_total"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

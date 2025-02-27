@@ -1,0 +1,64 @@
+<odoo>
+    <record id="view_rfp_report_form" model="ir.ui.view">
+        <field name="name">rfp.report.form</field>
+        <field name="model">procurement_management.rfp.report</field>
+        <field name="arch" type="xml">
+            <form string="Generate RFP Report" class="oe_form">
+                <sheet>
+                    <!-- Title Section -->
+                    <div style="text-align: center; padding: 15px;">
+                        <h1 style="color: #00b4d8; font-weight: bold; text-shadow: 2px 2px 4px rgba(0, 180, 216, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px;">
+                            📊 Generate RFP Report
+                        </h1>
+                    </div>
+
+                    <!-- Form Fields Section (Final Fix) -->
+                    <group>
+                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px; padding: 15px;">
+                            <div style="flex-grow: 1; min-width: 200px;">
+                                <field name="supplier_id" widget="many2one" options="{'no_create': True}"
+                                       placeholder="🔍 Select Supplier" string="Supplier"
+                                       style="width: 100%; height: 40px; font-size: 16px; padding: 10px; border-radius: 6px;"/>
+                            </div>
+                            <div style="flex-grow: 1; min-width: 200px;">
+                                <field name="start_date" widget="date" options="{'datepicker': true}"
+                                       placeholder="📅 Select Start Date" string="Start Date"
+                                       style="width: 100%; height: 40px; font-size: 16px; padding: 10px; border-radius: 6px;"/>
+                            </div>
+                            <div style="flex-grow: 1; min-width: 200px;">
+                                <field name="end_date" widget="date" options="{'datepicker': true}"
+                                       placeholder="📅 Select End Date" string="End Date"
+                                       style="width: 100%; height: 40px; font-size: 16px; padding: 10px; border-radius: 6px;"/>
+                            </div>
+                        </div>
+                    </group>
+
+                    <!-- Divider -->
+                    <separator string="📑 Report Format Selection" colspan="4"
+                               style="margin: 20px 0; font-size: 14px; font-weight: bold; text-align: center;"/>
+
+                    <!-- Footer Buttons Section -->
+                    <footer style="text-align: center; padding-top: 15px;">
+                        <button name="action_generate_qweb_report" string="📄 Generate QWeb Report"
+                                type="object" class="btn-primary"
+                                style="background: linear-gradient(to right, #9b5de5, #8338ec); font-size: 16px; padding: 12px 24px; border-radius: 10px; margin-right: 15px; color: white; font-weight: bold;"/>
+                        <button name="action_generate_excel_report" string="📊 Generate Excel Report"
+                                type="object" class="btn-success"
+                                style="background: linear-gradient(to right, #06d6a0, #04a777); font-size: 16px; padding: 12px 24px; border-radius: 10px; margin-right: 15px; color: white; font-weight: bold;"/>
+                        <button string="❌ Cancel" class="btn-secondary" special="cancel"
+                                style="background: linear-gradient(to right, #adb5bd, #6c757d); font-size: 16px; padding: 12px 24px; border-radius: 10px; color: white; font-weight: bold;"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+<!--                                📊 Generate RFP Report-->
+
+    <record id="action_rfp_report" model="ir.actions.act_window">
+        <field name="name">RFP Report</field>
+        <field name="res_model">procurement_management.rfp.report</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>
